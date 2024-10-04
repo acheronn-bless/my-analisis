@@ -9,7 +9,7 @@ sns.set(style='dark')
 
 # Load data
 def load_data():
-    data = pd.read_csv("days_fixed.csv")
+    data = pd.read_csv("C:/Users/Lenovo/Downloads/github/my-analisis/dashboard/days_fixed.csv")
     return data
 
 days_df = load_data()
