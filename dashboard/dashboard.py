@@ -4,23 +4,47 @@ import seaborn as sns
 import streamlit as st
 from babel.numbers import format_currency
 
-#set style seaborn
+# Set style seaborn
 sns.set(style='dark')
 
 # Load data
+@st.cache_data
 def load_data():
     data = pd.read_csv("https://raw.githubusercontent.com/acheronn-bless/my-analisis/refs/heads/main/dashboard/dayy.csv")
     return data
 
-days_df = load_data()
+# Fungsi untuk memperbarui label dari numerik ke kategorikal
+def update_labels(df):
+    # Ubah kolom 'holiday' dari angka 0 dan 1 menjadi 'Tidak' dan 'Ya'
+    df['holiday'] = df['holiday'].map({0: 'Tidak', 1: 'Ya'})
+    
+    # Ubah kolom 'weekday' dari angka (0-6) menjadi nama hari
+    df['weekday'] = df['weekday'].replace({
+        0: 'Senin', 
+        1: 'Selasa', 
+        2: 'Rabu', 
+        3: 'Kamis', 
+        4: 'Jumat', 
+        5: 'Sabtu', 
+        6: 'Minggu'
+    })
+    
+    # Ubah kolom 'season' dari angka menjadi label kategorikal
+    df['season'] = df['season'].replace({
+        1: 'Winter',
+        2: 'Spring',
+        3: 'Summer',
+        4: 'Fall'
+    })
+    
+    return df
 
-# Prepare for dashboard
- 
+# Load data dan perbarui label
+days_df = load_data()
+days_df = update_labels(days_df)
+
 # Judul dashboard
 st.title('Sewa Sepeda Dashboard')
-
-
-
 
 # Filter component
 min_date = pd.to_datetime(days_df['date']).dt.date.min()
@@ -36,76 +60,16 @@ start_date, end_date = st.date_input(
 main_df = days_df[(days_df['date'] >= str(start_date)) & 
                 (days_df['date'] <= str(end_date))]
 
-
-
 # Menyiapkan season_rent_df
-
 def create_season_rent_df(df):
     season_rent_df = df.groupby(by='season')[['registered', 'casual']].sum().reset_index()
     return season_rent_df
 
-# Menyiapkan daily rent
-def create_daily_rent_df(df):
-    daily_rent_df = df.groupby(by='date').agg({
-        'count': 'sum'
-    }).reset_index()
-    return daily_rent_df
-
-# Menyiapkan daily casual rent
-def create_daily_casual_rent_df(df):
-    daily_casual_rent_df = df.groupby(by='date').agg({
-        'casual': 'sum'
-    }).reset_index()
-    return daily_casual_rent_df
-
-# Menyiapkan daily registered rent
-def create_daily_registered_rent_df(df):
-    daily_registered_rent_df = df.groupby(by='date').agg({
-        'registered': 'sum'
-    }).reset_index()
-    return daily_registered_rent_df
-
-# Menyiapkan monthly rent
-def create_monthly_rent_df(df):
-    monthly_rent_df = df.groupby(by='month').agg({
-        'count': 'sum'
-    })
-    ordered_months = [
-        'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
-        'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'
-    ]
-    monthly_rent_df = monthly_rent_df.reindex(ordered_months, fill_value=0)
-    return monthly_rent_df
-
-# Menyiapkan weekday_rent
-def create_weekday_rent_df(df):
-    weekday_rent_df = df.groupby(by='weekday').agg({
-        'count': 'sum'
-    }).reset_index()
-    return weekday_rent_df
-
-# Menyiapkan holiday rent
-def create_holiday_rent_df(df):
-    holiday_rent_df = df.groupby(by='holiday').agg({
-        'count': 'sum'
-    }).reset_index()
-    return holiday_rent_df
-
-# prepare dataframe
-
-daily_rent_df = create_daily_rent_df(main_df)
-daily_casual_rent_df = create_daily_casual_rent_df(main_df)
-daily_registered_rent_df = create_daily_registered_rent_df(main_df)
-season_rent_df = create_season_rent_df(main_df)
-monthly_rent_df = create_monthly_rent_df(main_df)
-weekday_rent_df = create_weekday_rent_df(main_df)
-holiday_rent_df = create_holiday_rent_df(main_df)
-
-# Pembuatan sewa sepeda berdasarkan  musim
+# Plot untuk penyewaan berdasarkan musim
 st.subheader('Rental based on season')
+season_rent_df = create_season_rent_df(main_df)
 
-fig, ax = plt.subplots(figsize=(20, 10))
-
+fig, ax = plt.subplots(figsize=(10,6))
 sns.barplot(
     x='season',
     y='registered',
@@ -135,22 +99,27 @@ ax.tick_params(axis='y', labelsize=15)
 ax.legend()
 st.pyplot(fig)
 
-# jumlah penyewaan berdasarkan weekday dan holiday
-
+# Menambahkan subjudul untuk 'Jumlah penyewaan berdasarkan weekday dan holiday'
 st.subheader('Bike Rentals in weekday and holiday')
 
-fig, axes = plt.subplots(nrows=2, ncols=1, figsize=(20,8))
+fig, axes = plt.subplots(nrows=2, ncols=1, figsize=(20, 12))
 
 colors1 = ["tab:blue", "tab:red"]
 colors2 = ["tab:blue", "tab:orange", "tab:green", "tab:red", "tab:purple", "tab:brown", "tab:pink"]
 
-#  holiday plot
+# Mengurutkan kategori pada kolom 'weekday'
+order = ['Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu', 'Minggu']
+main_df['weekday'] = pd.Categorical(main_df['weekday'], categories=order, ordered=True)
+
+# Plot untuk holiday
+holiday_rent_df = main_df.groupby('holiday').agg({'count': 'sum'}).reset_index()
 sns.barplot(
-  x='holiday',
-  y='count',
-  data=holiday_rent_df,
-  palette=colors1,
-  ax=axes[0])
+    x='holiday',
+    y='count',
+    data=holiday_rent_df,
+    palette=colors1,
+    ax=axes[0]
+)
 
 for index, row in enumerate(holiday_rent_df['count']):
     axes[0].text(index, row + 1, str(row), ha='center', va='bottom', fontsize=12)
@@ -160,13 +129,15 @@ axes[0].set_ylabel(None)
 axes[0].tick_params(axis='x', labelsize=15)
 axes[0].tick_params(axis='y', labelsize=10)
 
-# Weekday Plot
+# Plot untuk weekday
+weekday_rent_df = main_df.groupby('weekday').agg({'count': 'sum'}).reset_index()
 sns.barplot(
-  x='weekday',
-  y='count',
-  data=weekday_rent_df,
-  palette=colors2,
-  ax=axes[1])
+    x='weekday',
+    y='count',
+    data=weekday_rent_df,
+    palette=colors2,
+    ax=axes[1]
+)
 
 for index, row in enumerate(weekday_rent_df['count']):
     axes[1].text(index, row + 1, str(row), ha='center', va='bottom', fontsize=12)
@@ -176,11 +147,10 @@ axes[1].set_ylabel(None)
 axes[1].tick_params(axis='x', labelsize=15)
 axes[1].tick_params(axis='y', labelsize=10)
 
-# Adjust layout
+# Adjust layout to fit both subplots well
 plt.tight_layout()
 
 # Display the figure in Streamlit
 st.pyplot(fig)
-
 
 st.caption('Copyright (c) Mikhael Marcelino 2024')

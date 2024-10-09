@@ -1,8 +1,18 @@
 SEWA SEPEDA DASHBOARD - FINAL PROJECT
 
-# SET UP ENVIRONMENT - TERMINAL
+## DESCRIPTION
+
+Dashbord dirancang untuk menvisualisasikan hasil olah data yang telah dilakukan
+
+
+# CARA INSTALL
+a. clone repository saya ke proyek lokal di komputer anda
+git clone https://github.com/acheronn-bless/data-bike-sharing.git
+
+b. download terlebih dahulu library yang dibutuhkan dengan menjalankan perintah di bawah ini
 pip install streamlit
 pip install -r requirements.txt
+
 
 # HOW TO RUN
 
@@ -14,6 +24,8 @@ pip install -r requirements.txt
 5. run the code cell
 
 # dashboard
-1. Download dahulu projectnya
-2. install streamlit di terminal sesuai arahan di atas
-3. Open vscode dan run file yang tadi di download
+1. MASUK KE DIREKTORI LOKAL ANDA
+cd my-analisis/dashboard/
+streamlit run dashboard.py
+
+#
