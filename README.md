@@ -30,3 +30,5 @@ streamlit run dashboard.py
 atau bisa langsung ke bike-marc.streamlit.app
 
 # PREVIEW WEB
+https://github.com/acheronn-bless/my-analisis/blob/main/preview.png
+
