@@ -27,5 +27,6 @@ pip install -r requirements.txt
 1. MASUK KE DIREKTORI LOKAL ANDA
 cd my-analisis/dashboard/
 streamlit run dashboard.py
+atau bisa langsung ke bike-marc.streamlit.app
 
-#
+# PREVIEW WEB
