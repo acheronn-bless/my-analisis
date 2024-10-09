@@ -8,7 +8,7 @@ Dashbord dirancang untuk menvisualisasikan hasil olah data yang telah dilakukan
 # CARA INSTALL
 a. clone repository saya ke proyek lokal di komputer anda
 
-git clone https://github.com/acheronn-bless/data-bike-sharing.git
+git clone https://github.com/acheronn-bless/my-analisis.git
 
 b. download terlebih dahulu library yang dibutuhkan dengan menjalankan perintah di bawah ini
 
