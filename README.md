@@ -13,6 +13,7 @@ git clone https://github.com/acheronn-bless/data-bike-sharing.git
 b. download terlebih dahulu library yang dibutuhkan dengan menjalankan perintah di bawah ini
 
 pip install streamlit
+
 pip install -r requirements.txt
 
 
@@ -29,6 +30,7 @@ pip install -r requirements.txt
 1. MASUK KE DIREKTORI LOKAL ANDA
 
 cd my-analisis/dashboard/
+
 streamlit run dashboard.py
 
 atau bisa langsung ke bike-marc.streamlit.app
